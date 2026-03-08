@@ -1,6 +1,6 @@
 import { WORLD_W, WORLD_H, PLAYER_RADIUS } from '../shared/constants.js';
 import { WALLS } from '../shared/map.js';
-import { circleVsAABB } from './Physics.js';
+import { circleVsAABB } from '../shared/Physics.js';
 
 /**
  * MapManager — данные карты: спавн-точки, (в будущем) стены.

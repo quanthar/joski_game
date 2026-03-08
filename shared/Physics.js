@@ -1,14 +1,11 @@
-import { PLAYER_RADIUS, BULLET_RADIUS } from '../shared/constants.js';
+import { PLAYER_RADIUS, BULLET_RADIUS } from './constants.js';
 
 /**
- * Physics — серверная физика и проверки коллизий.
+ * Physics — общая физика и проверки коллизий.
  */
 
 /**
  * Проверка попадания пули в игрока (circle vs circle).
- * @param {object} bullet — { x, y }
- * @param {object} player — { x, y }
- * @returns {boolean}
  */
 export function bulletHitsPlayer(bullet, player) {
     const dx = bullet.x - player.x;
@@ -20,13 +17,6 @@ export function bulletHitsPlayer(bullet, player) {
 
 /**
  * Проверка коллизии двух кругов.
- * @param {number} x1
- * @param {number} y1
- * @param {number} r1
- * @param {number} x2
- * @param {number} y2
- * @param {number} r2
- * @returns {boolean}
  */
 export function circleVsCircle(x1, y1, r1, x2, y2, r2) {
     const dx = x2 - x1;
@@ -37,26 +27,7 @@ export function circleVsCircle(x1, y1, r1, x2, y2, r2) {
 }
 
 /**
- * Проверка точки внутри AABB.
- * @param {number} px
- * @param {number} py
- * @param {object} rect — { x, y, w, h }
- * @returns {boolean}
- */
-export function pointInAABB(px, py, rect) {
-    return (
-        px >= rect.x && px <= rect.x + rect.w &&
-        py >= rect.y && py <= rect.y + rect.h
-    );
-}
-
-/**
  * Проверка пересечения круга и AABB.
- * @param {number} cx — центр круга X
- * @param {number} cy — центр круга Y
- * @param {number} cr — радиус круга
- * @param {object} rect — { x, y, w, h }
- * @returns {boolean}
  */
 export function circleVsAABB(cx, cy, cr, rect) {
     const closestX = Math.max(rect.x, Math.min(cx, rect.x + rect.w));
@@ -105,4 +76,3 @@ export function resolveCircleAABB(cx, cy, cr, rect) {
     }
     return { collided: false, x: cx, y: cy };
 }
-

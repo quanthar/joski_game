@@ -51,7 +51,7 @@ export class Game {
 
         this._inputSeq = 0;
 
-        // Death state
+        this.items = [];
         this.isDead = false;
         this.deathTimer = 0;         // сколько осталось до респавна (мс)
         this.killedByName = '';      // кто убил
@@ -230,9 +230,7 @@ export class Game {
                 let bullet = this.bullets.get(sb.id);
                 if (!bullet) {
                     bullet = this.bulletPool.acquire();
-                    // Мы не знаем dirX/Y из снапшота, но можем вычислить или просто экстраполировать
-                    // Для простоты в BULLET_SPEED добавим экстраполяцию
-                    bullet.init(sb.id, sb.x, sb.y, Math.cos(sb.rotation || 0), Math.sin(sb.rotation || 0), sb.ownerId);
+                    bullet.init(sb.id, sb.x, sb.y, Math.cos(sb.rotation || 0), Math.sin(sb.rotation || 0), sb.ownerId, sb.type);
                     this.bullets.set(sb.id, bullet);
                 } else {
                     bullet.updateFromSnapshot(sb);
@@ -245,6 +243,10 @@ export class Game {
                     this.bullets.delete(id);
                 }
             }
+        }
+
+        if (data.items) {
+            this.items = data.items;
         }
     }
 
@@ -301,16 +303,17 @@ export class Game {
 
         const { dx, dy } = this.isDead ? { dx: 0, dy: 0 } : input.getMovement();
         const isSprinting = input.isSprinting();
+        const isDashing = input.isDashing();
         const worldMouse = input.getWorldMouse(camera);
         player.rotation = angleTo(player.x, player.y, worldMouse.x, worldMouse.y);
 
         const shooting = this.isDead ? false : input.isShooting();
 
         this._inputSeq++;
-        if (dx !== 0 || dy !== 0) {
-            player.applyInput(this._inputSeq, dx, dy, dt, isSprinting);
+        if (dx !== 0 || dy !== 0 || isDashing) {
+            player.applyInput(this._inputSeq, dx, dy, dt, isSprinting, isDashing, player.rotation);
         } else {
-            player.prediction.addInput(this._inputSeq, 0, 0, dt, isSprinting);
+            player.prediction.addInput(this._inputSeq, 0, 0, dt, isSprinting, isDashing, player.rotation);
         }
 
         if (net.connected) {
@@ -321,6 +324,7 @@ export class Game {
                 shoot: shooting,
                 reload: input.isReloadPressed(),
                 sprint: isSprinting,
+                dash: isDashing
             });
 
             if (shooting && !this.isDead) {
@@ -358,9 +362,13 @@ export class Game {
 
         this.particles.draw(renderer.ctx);
 
+        for (const item of this.items) {
+            renderer.drawItem(item);
+        }
+
         for (const [, bullet] of this.bullets) {
             if (bullet.alive) {
-                renderer.drawBullet(bullet.x, bullet.y, bullet.ownerId === this.myId);
+                renderer.drawBullet(bullet.x, bullet.y, bullet.ownerId === this.myId, bullet.type);
             }
         }
 
@@ -391,14 +399,15 @@ export class Game {
             playerY: player.y,
             netStatus: this.netStatus,
             playerCount: this.remotePlayers.size + 1,
-            ammo: player.ammo !== undefined ? player.ammo : PISTOL_MAG_SIZE,
+            ammo: player.ammo !== undefined ? player.ammo : (player.maxAmmo || 12),
+            maxAmmo: player.maxAmmo || 12,
             reloading: player.reloading || false,
         });
 
         if (!this.isDead) {
             renderer.drawAmmoBar(
-                player.ammo !== undefined ? player.ammo : PISTOL_MAG_SIZE,
-                PISTOL_MAG_SIZE,
+                player.ammo !== undefined ? player.ammo : (player.maxAmmo || 12),
+                player.maxAmmo || 12,
                 player.reloading || false
             );
         }

@@ -1,6 +1,6 @@
 import {
     WORLD_W, WORLD_H, TILE_SIZE, PLAYER_RADIUS,
-    BULLET_RADIUS,
+    BULLET_RADIUS, ITEM_RADIUS
 } from '@shared/constants.js';
 import { WALLS, DECORATIONS } from '@shared/map.js';
 
@@ -247,16 +247,68 @@ export class Renderer {
         ctx.stroke();
     }
 
-    drawBullet(x, y, isOwn) {
+    drawBullet(x, y, isOwn, type = 'pistol') {
         const { ctx } = this;
         ctx.save();
-        ctx.fillStyle = isOwn ? '#00ff88' : '#fff';
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = ctx.fillStyle;
 
+        if (type === 'rocket') {
+            ctx.fillStyle = '#ff4d4d'; // Red rocket
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = '#ff9f43';
+            ctx.beginPath();
+            ctx.arc(x, y, BULLET_RADIUS + 4, 0, Math.PI * 2);
+            ctx.fill();
+            // Core
+            ctx.fillStyle = '#fff';
+            ctx.beginPath();
+            ctx.arc(x, y, BULLET_RADIUS, 0, Math.PI * 2);
+            ctx.fill();
+        } else {
+            ctx.fillStyle = isOwn ? '#00ff88' : '#fff';
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = ctx.fillStyle;
+            ctx.beginPath();
+            ctx.arc(x, y, BULLET_RADIUS + 1.5, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        ctx.restore();
+    }
+
+    drawItem(item) {
+        const { ctx } = this;
+        ctx.save();
+        ctx.translate(item.x, item.y);
+
+        // Пульсация
+        const pulse = 1 + Math.sin(performance.now() / 200) * 0.15;
+        ctx.scale(pulse, pulse);
+
+        let color = '#fff';
+        let text = '?';
+        switch (item.type) {
+            case 'medkit': color = '#ff4d4d'; text = '+'; break;
+            case 'speed': color = '#feca57'; text = '>>'; break;
+            case 'rifle': color = '#ff9f43'; text = 'AR'; break;
+            case 'shotgun': color = '#5f27cd'; text = 'SG'; break;
+            case 'rocket': color = '#ee5253'; text = 'RK'; break;
+            default: color = '#fff'; break;
+        }
+
+        ctx.fillStyle = color;
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = color;
         ctx.beginPath();
-        ctx.arc(x, y, BULLET_RADIUS + 1.5, 0, Math.PI * 2);
+        ctx.arc(0, 0, ITEM_RADIUS, 0, Math.PI * 2);
         ctx.fill();
+
+        ctx.fillStyle = '#fff';
+        ctx.shadowBlur = 0;
+        ctx.font = 'bold 12px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text, 0, 0);
+
         ctx.restore();
     }
 

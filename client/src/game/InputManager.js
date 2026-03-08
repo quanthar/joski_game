@@ -97,4 +97,8 @@ export class InputManager {
     isSprinting() {
         return this.keys.has('ShiftLeft') || this.keys.has('ShiftRight');
     }
+
+    isDashing() {
+        return this.keys.has('Space');
+    }
 }

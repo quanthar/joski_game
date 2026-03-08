@@ -16,13 +16,15 @@ export class ServerBullet {
      * @param {number} dirX — нормализованное направление
      * @param {number} dirY
      */
-    constructor(ownerId, x, y, dirX, dirY) {
+    constructor(ownerId, x, y, dirX, dirY, type = 'pistol') {
         this.id = String(nextBulletId++);
         this.ownerId = ownerId;
         this.x = x;
         this.y = y;
         this.dirX = dirX;
         this.dirY = dirY;
+        this.type = type;
+        this.speed = BULLET_SPEED;
         this.alive = true;
         this.age = 0; // мс
     }
@@ -34,8 +36,8 @@ export class ServerBullet {
     update(dt) {
         if (!this.alive) return;
 
-        this.x += this.dirX * BULLET_SPEED * dt;
-        this.y += this.dirY * BULLET_SPEED * dt;
+        this.x += this.dirX * this.speed * dt;
+        this.y += this.dirY * this.speed * dt;
         this.age += dt * 1000;
 
         // Уничтожить если вылетела за мир или истекло время
@@ -58,6 +60,7 @@ export class ServerBullet {
             y: Math.round(this.y),
             rotation: Math.atan2(this.dirY, this.dirX),
             ownerId: this.ownerId,
+            type: this.type,
         };
     }
 }
