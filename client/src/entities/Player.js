@@ -23,6 +23,8 @@ export class Player {
         this.maxAmmo = 0;
         this.reloading = false;
 
+        this.weaponType = 'pistol'; // Add synced weaponType
+
         this.heroType = 'scout';
         this.speedMult = 1.0;
 
@@ -96,6 +98,10 @@ export class Player {
             this.heroType = serverState.heroType;
             const heroStats = HEROES.find(h => h.type === this.heroType);
             if (heroStats) this.speedMult = heroStats.speed;
+        }
+
+        if (serverState.weaponType) {
+            this.weaponType = serverState.weaponType;
         }
 
         if (serverState.lastProcessedSeq !== undefined) {

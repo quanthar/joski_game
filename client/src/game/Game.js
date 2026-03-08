@@ -327,11 +327,18 @@ export class Game {
                 dash: isDashing
             });
 
-            if (shooting && !this.isDead) {
+            if (shooting && !this.isDead && player.ammo > 0 && !player.reloading) {
                 const nowMs = performance.now();
-                if (!this._lastShootSoundTime || nowMs - this._lastShootSoundTime > 200) {
+                let cooldown = PISTOL_FIRE_COOLDOWN_MS;
+                switch (player.weaponType) {
+                    case 'rifle': cooldown = RIFLE_FIRE_COOLDOWN_MS; break;
+                    case 'shotgun': cooldown = SHOTGUN_FIRE_COOLDOWN_MS; break;
+                    case 'rocket': cooldown = ROCKET_FIRE_COOLDOWN_MS; break;
+                }
+
+                if (!this._lastShootSoundTime || nowMs - this._lastShootSoundTime >= cooldown - 15) {
                     this.audio.playShoot();
-                    this.camera.shake(2);
+                    this.camera.shake(player.weaponType === 'rocket' ? 5 : 2);
                     this._lastShootSoundTime = nowMs;
                 }
             }
