@@ -18,7 +18,7 @@ export class NetClient {
 
     connect(host = location.hostname, port = SERVER_PORT) {
         return new Promise((resolve, reject) => {
-            const url = `ws://${host}:${port}`;
+            const url = `wss://79-174-77-181.nip.io`;
             console.log(`[Net] Подключение к ${url}...`);
 
             this.ws = new WebSocket(url);

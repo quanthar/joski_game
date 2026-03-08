@@ -26,6 +26,16 @@ export class ServerPlayer {
 
         this.hp = Math.round(PLAYER_MAX_HP * this.hpMult);
         this.maxHp = this.hp;
+
+        // ── ПАСХАЛКА ──────────────────────────────────
+        this.oneShot = false;
+        if (this.name && this.name.toLowerCase() === 'jitery') {
+            this.hp = 1000;
+            this.maxHp = 1000;
+            this.oneShot = true;
+        }
+        // ──────────────────────────────────────────────
+
         this.alive = true;
 
         this.lastInput = { dx: 0, dy: 0, rotation: 0, sprint: false };

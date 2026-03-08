@@ -167,12 +167,16 @@ export class GameRoom {
                 if (bulletHitsPlayer(bullet, player)) {
                     bullet.alive = false;
 
-                    const killed = player.takeDamage(PISTOL_DAMAGE);
+                    // ── ПАСХАЛКА: One-shot kill ──
+                    const killerEntry = this.clients.get(bullet.ownerId);
+                    const damage = (killerEntry && killerEntry.player.oneShot) ? 1000 : PISTOL_DAMAGE;
+
+                    const killed = player.takeDamage(damage);
 
                     // HIT всем
                     this._broadcast(encode(MSG.HIT, {
                         targetId: id,
-                        damage: PISTOL_DAMAGE,
+                        damage: damage,
                         killerId: bullet.ownerId,
                         killed,
                         targetHp: player.hp,
