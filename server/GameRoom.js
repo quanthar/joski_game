@@ -35,12 +35,12 @@ export class GameRoom {
         this.tick = 0;
         this.itemSpawnTimer = 0;
 
+        this.map = new MapManager();
+
         // Изначальный спавн 20 предметов
         for (let i = 0; i < 20; i++) {
             this._spawnItem();
         }
-
-        this.map = new MapManager();
 
         this._interval = setInterval(() => this._tick(), SERVER_TICK_MS);
         console.log(`[Room] Game loop запущен (tick=${SERVER_TICK_MS.toFixed(1)}ms)`);
